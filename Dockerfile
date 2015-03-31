@@ -3,8 +3,9 @@ FROM ubuntu:14.04
 RUN apt-get update
 
 # Install apache
-RUN apt-get update && \
-    apt-get install -q -y apache2 python-pip \
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -q -y \
+            apache2 python-pip \
             python-dev \
             apache2 libapache2-mod-wsgi && \
     apt-get clean && \
@@ -16,12 +17,11 @@ RUN pip install -U pip
 RUN pip install -U tiddlywebwiki
 
 # Setup wiki volume
-VOLUME /var/lib/tiddlywiki
-WORKDIR /var/lib/tiddlywiki
+VOLUME /www
+VOLUME /var/log/apache2
+VOLUME /etc/apache2
+WORKDIR /www
 
-# Add init-and-run script
-#ADD init-and-run-wiki /usr/local/bin/init-and-run-wiki
+CMD ["/bin/bash", "-c", "source /etc/apache2/envvars; apache2 -D FOREGROUND" ]
 
-# Meta
-#CMD ["/usr/local/bin/init-and-run-wiki"]
-#EXPOSE 8080
+EXPOSE 80
